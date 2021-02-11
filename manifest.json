@@ -1,7 +1,7 @@
 {
-  "domain": "solarpath_light",
+  "domain": "solarpath",
   "name": "Solarpath Light",
-  "documentation": "https://github.com/tinic/solarpath-app-server.git",
+  "documentation": "https://github.com/tinic/solarpath-hass.git",
   "dependencies": [],
   "codeowners": [],
   "requirements": []

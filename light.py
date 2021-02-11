@@ -1,26 +1,36 @@
 import logging
-import requests
 import voluptuous as vol
+import requests
 
 import homeassistant.helpers.config_validation as cv
-# Import the device class from the component that you want to support
+
 from homeassistant.components.light import (
-    ATTR_BRIGHTNESS, ATTR_RGB_COLOR, PLATFORM_SCHEMA, Light)
+    PLATFORM_SCHEMA, 
+    SUPPORT_COLOR,
+    SUPPORT_BRIGHTNESS,
+    ATTR_BRIGHTNESS, 
+    ATTR_RGB_COLOR, 
+    Light)
+
 from homeassistant.const import CONF_HOST
+
+import homeassistant.util.color as color_util
 
 _LOGGER = logging.getLogger(__name__)
 
-# Validation of the user's configuration
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_HOST): cv.string,
 })
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the Solarpath light platform."""
     host = config[CONF_HOST]
+    
     lights = json.loads(requests.get(host))
-    add_entities(SolarpathLight(light, host) for light in lights)
+    
+    add_entities(SolarpathFixture(light, host) for light in lights)
 
-class SolarpathLight(Light):
+class SolarpathFixture(Light):
     def __init__(self, light, host):
         self._light = light
         self._host = host
@@ -31,20 +41,22 @@ class SolarpathLight(Light):
         return self._light["device_eui"]
 
     @property
-    def brightness(self):
-        return None
-    
-    def rgb_color(self):
-        return None
-
     def is_on(self):
         return self._light["light_on"]
 
-    def turn_on(self, **kwargs):
+    @property
+    def brightness(self) -> int:
+        return None
+
+    @property
+    def rgb_color(self):
+        return None
+
+    async def async_turn_on(self, **kwargs):
         self._light["light_on"] = 1
         requests.post(self._host, json.dumps(self._light))
 
-    def turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         self._light["light_on"] = 0
         requests.post(self._host, json.dumps(self._light))
 
