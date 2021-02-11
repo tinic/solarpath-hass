@@ -1,5 +1,5 @@
 {
-  "domain": "solarpath",
+  "domain": "solarpath_hass",
   "name": "Solarpath Light",
   "documentation": "https://github.com/tinic/solarpath-hass.git",
   "dependencies": [],
